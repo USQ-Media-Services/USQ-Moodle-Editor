@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html ng-app="RMP">
+
+<head>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.2, minimum-scale=1.0, user-scalable=no">
+
+
+	<link rel="stylesheet" type="text/css"  href="bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css"  href="bower_components/medium-editor/dist/css/medium-editor.min.css">
+	<link rel="stylesheet" type="text/css"  href="bower_components/medium-editor/dist/css/themes/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css"  href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css"  href="bower_components/angular/angular-csp.css">
+	<link rel="stylesheet" type="text/css"  href="bower_components/angular-bootstrap/ui-bootstrap-csp.css">
+	<link rel="stylesheet" type="text/css"  href="bower_components/open-sans/css/open-sans.min.css">
+	<link rel="stylesheet" type="text/css"  href="sys/css/styles.css" >
+	<link rel="stylesheet" type="text/css"  href="sys/css/editor.css" >
+
+
+
+	<script src="bower_components/jaxxy/dist/jaxxy.min.js" charset="utf-8"></script>
+	<script src="bower_components/html5-polyfills/classList.js" charset="utf-8"></script>
+	<script src="bower_components/js-commons/jsCommons.min.js" charset="utf-8"></script>
+	<script src="bower_components/pepjs/dist/pep.min.js" charset="utf-8"></script>
+	<script src="bower_components/jsonfn/jsonfn.js" charset="utf-8"></script>
+	<script src="bower_components/jquery/dist/jquery.min.js" charset="utf-8"></script>
+	<script src="bower_components/angular/angular.min.js" charset="utf-8"></script>
+	<script src="bower_components/angular-bootstrap/ui-bootstrap.min.js" charset="utf-8"></script>
+
+	<script src="sys/js/db.js" type="text/javascript" charset="utf-8" ></script>
+
+	<script src="bower_components/medium-editor/dist/js/medium-editor.min.js" charset="utf-8"></script>
+	<script src="bower_components/angular-medium-editor/dist/angular-medium-editor.min.js" charset="utf-8"></script>
+	<script src="bower_components/tinymce-dist/tinymce.min.js" charset="utf-8"></script>
+	<script src="bower_components/angular-ui-tinymce/src/tinymce.js" charset="utf-8"></script>
+
+	<script src="sys/js/main.js" type="text/javascript" charset="utf-8" ></script>
+
+
+
+	<!--The title-->
+	<title>Responsive Moodle Pages - USQ</title>
+</head>
+
+
+<body ng-controller="master" ng-cloak ng-class="{_live: live}">
+
+	<style data-navblock data-frontpage set-icons-styles ></style>
+
+
+	<header style="position:fixed; top:10px; right: 100px; z-index: 5;"><button class="btn btn-success" ng-click="save()">Save</button></header>
+	<header style="position:fixed; top:10px; right: 10px; z-index: 5;"><button class="btn btn-info" ng-click="live = !live"><span ng-show="live">&nbsp;Editor&nbsp;&nbsp;</span><span ng-show="!live">Preview</span></button></header>
+
+
+	<div style="display:none">
+
+		<!-- Initial and error screen !-->
+		<div modal="!data || !data.headings || !!error || !!saving" options="{backdropClick:false, keyboard:false, backdropFade:true, dialogFade:true}">
+
+			<!-- Page is loading required files !-->
+			<div ng-show="(!data || !data.headings || !inited) && !error">
+
+				<div class="modal-header">Please wait</div>
+				<div class="modal-body error">
+					The page is loading the required files.
+				</div>
+			</div>
+
+			<!-- Something could not load.!-->
+			<div ng-show="!!error">
+				<div class="modal-header text-error">An error occurred...</div>
+				<div class="modal-body" ng-bind-html-unsafe="errors[error]"></div>
+			</div>
+
+			<!-- Saving the page !-->
+			<div ng-show="!!saving">
+				<div class="modal-header">Saving the page.</div>
+				<div class="modal-body">Please be patient while the page is saved to USQStaffDesk - Staff eLE.</div>
+			</div>
+
+		</div>
+
+
+
+		<!--Edit text-with-image image/video !-->
+		<div modal="$root.edit.type == 'text-with-image' " options="{backdropClick:false, keyboard:false, backdropFade:false, dialogFade:false}">
+
+			<div class="modal-header">Text with Image/Video</div>
+			<div class="modal-body cpm_row_featureImage">
+
+				<div ng-style="{'text-align':$root.edit.align}">
+					<div ng-style="{'text-align':$root.edit.align}">
+						<img ng-src="{{$root.edit.image||placeholders.floatingImage}}" ng-class="{'cpm_featureImagePlaceholder':!$root.edit.image}" class="cpm_featureImage cpm_featureImage{{$root.edit.imageSize||'Small'}}" style="cursor:default;">
+					</div>
+				</div>
+				<br>
+				<table cellpadding="2" cellspacing="0" width="100%">
+					<tr>
+						<td align="left" width="119">Image/Youtube URL:</td>
+						<td><input class="bigInput" ng-model="$root.edit.url" ng-change="$root.edit.rawYoutube = getYoutubeObject($root.edit.url); $root.edit.image = ($root.edit.rawYoutube || {thumb:$root.edit.url}).thumb; $root.edit.embed = $root.edit.rawYoutube.embed;"></td>
+					</tr>
+					<tr>
+						<td align="left">Transcript URL:</td>
+						<td><input class="bigInput" ng-model="$root.edit.transcript"></td>
+					</tr>
+					<tr>
+						<td align="left">Caption:</td>
+						<td><input class="bigInput" ng-model="$root.edit.title"></td>
+					</tr>
+				</table>
+
+				<br>
+				<br>
+
+				<button ng-click="$root.edit.align = 'Left'" ng-class="{'btn-info':$root.edit.align == 'Left'}">Left</button>
+				<button ng-click="$root.edit.align = 'Right'" ng-class="{'btn-info':$root.edit.align == 'Right' || !$root.edit.align}">Right</button>
+
+				<br>
+				<br>
+				<button ng-click="$root.edit.imageSize = 'Small'" ng-class="{'btn-info':$root.edit.imageSize == 'Small'}">Small</button>
+				<button ng-click="$root.edit.imageSize = 'Medium'" ng-class="{'btn-info':$root.edit.imageSize == 'Medium'}">Medium</button>
+				<button ng-click="$root.edit.imageSize = 'Large'" ng-class="{'btn-info':$root.edit.imageSize == 'Large'}">Large</button>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-small btn-success" ng-click="$root.edit = null;" >OK</button>
+			</div>
+		</div>
+
+
+
+		<!--Edit featureImage image/video !-->
+		<div modal="$root.edit.type == 'featureImage' " options="{backdropClick:false, keyboard:false, backdropFade:false, dialogFade:false}">
+
+			<div class="modal-header">Feature Image/Video</div>
+			<div class="modal-body cpm_row_featureImage">
+
+				<div ng-style="{'text-align':$root.edit.align}">
+					<div ng-style="{'text-align':$root.edit.align}">
+						<img ng-src="{{$root.edit.image||placeholders.floatingImage}}" ng-class="{'cpm_featureImagePlaceholder':!$root.edit.image}" class="cpm_featureImage cpm_featureImage{{$root.edit.imageSize||'Small'}}" style="cursor:default;">
+					</div>
+				</div>
+
+				<table cellpadding="2" cellspacing="0" width="100%">
+					<tr>
+						<td align="left" width="119">Image/Youtube URL:</td>
+						<td><input class="bigInput" ng-model="$root.edit.url" ng-change="$root.edit.rawYoutube = getYoutubeObject($root.edit.url); $root.edit.image = ($root.edit.rawYoutube || {thumb:$root.edit.url}).thumb; $root.edit.embed = $root.edit.rawYoutube.embed;"></td>
+					</tr>
+					<tr>
+						<td align="left">Transcript URL:</td>
+						<td><input class="bigInput" ng-model="$root.edit.transcript"></td>
+					</tr>
+					<tr>
+						<td align="left">Caption:</td>
+						<td><input class="bigInput" ng-model="$root.edit.title"></td>
+					</tr>
+				</table>
+
+
+
+
+
+				<br>
+				<br>
+				<button ng-click="$root.edit.imageSize = 'Small'" ng-class="{'btn-info':$root.edit.imageSize == 'Small'}">Small</button>
+				<button ng-click="$root.edit.imageSize = 'Medium'" ng-class="{'btn-info':$root.edit.imageSize == 'Medium' || !$root.edit.imageSize}">Medium</button>
+				<button ng-click="$root.edit.imageSize = 'Large'" ng-class="{'btn-info':$root.edit.imageSize == 'Large'}">Large</button>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-small btn-success" ng-click="$root.edit = null;" >OK</button>
+			</div>
+		</div>
+
+
+
+		<!-- image/video row !-->
+		<div modal="$root.edit.type == 'video' " options="{fontawesome:true,backdropClick:false, keyboard:false, backdropFade:false, dialogFade:false}">
+			<div class="modal-header">Image/Video</div>
+			<div class="modal-body cpm_row_featureImage">
+				<div ng-style="{'text-align':$root.edit.align}">
+					<img ng-src="{{$root.edit.image||placeholders.floatingImage}}" ng-class="{'cpm_featureImagePlaceholder':!$root.edit.image}" class="cpm_featureImage" style="cursor:default;">
+				</div>
+
+				<br>
+				<br>
+				<table cellpadding="2" cellspacing="0" width="100%">
+					<tr>
+						<td align="left" width="119">Image/Youtube URL:</td>
+						<td><input class="bigInput" ng-model="$root.edit.url" ng-change="$root.edit.rawYoutube = getYoutubeObject($root.edit.url); $root.edit.image = ($root.edit.rawYoutube || {thumb:$root.edit.url}).thumb; $root.edit.embed = $root.edit.rawYoutube.embed;"></td>
+					</tr>
+					<tr>
+						<td align="left">Transcript URL:</td>
+						<td><input class="bigInput" ng-model="$root.edit.transcript"></td>
+					</tr>
+					<tr>
+						<td align="left">Caption:</td>
+						<td><input class="bigInput" ng-model="$root.edit.title"></td>
+					</tr>
+				</table>
+
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-small btn-success" ng-click="$root.edit = null;" >OK</button>
+				<button class="btn btn-small btn-danger" ng-click="$root.edit.title = ''; $root.edit.url = ''; $root.edit.image = ''; $root.edit.embed = ''; $root.edit = null;" >Delete</button>
+			</div>
+		</div>
+
+	</div>
+
+
+
+
+
+
+		<div class="cpm_wrapper"  ng-show="(data && data.headings) && !error">
+
+
+			<!-- Page title dropdown !-->
+			<div class="dropdown">
+				<div class="dropdown-toggle cpm_pageTitle" ng-class="{'cpm_adjustSection2':!data.noIntro}">
+					<div class="cpm_pageIcon {{getImageName(page.image || ' ')}}">&nbsp;</div>
+					&nbsp;
+					<span>{{ page.title || data.pageTitle || 'Please select the page title'}}</span>
+				</div>
+				<div class="editorItem dropdown-menu">
+					<div ng-repeat="h in data.headings track by $index">
+							<div ng-click="data.index = $index; $parent.page = h; data.pageTitle = h.title; data.titleIcon = h.image; ">
+								<div class="cpm_pageIcon  {{getImageName(h.image || ' ')}}"></div>
+							&nbsp;&nbsp;
+
+								<span ng-bind-html-unsafe="h.title"></span>
+							</div>
+						<div ng-repeat="s in h.sub track by $index" ng-click="$parent.$parent.page = s;data.index = $parent.$index; data.pageTitle = s.title; data.titleIcon = s.image;">
+							<img ng-src="{{s.image||placeholders.titleIcon}}" class="cpm_pageIcon">
+							&nbsp;&nbsp;
+							<span ng-bind-html-unsafe="s.title"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="cpm_content relative" >
+
+				<input type="checkbox" ng-model="data.noIntro" class="editorItem noIntro">
+
+				<div ng-class="{'hideIntro':!data.noIntro}" class="cpm_intro">
+					<textarea class="editorItem" ui-tinymce="getOptions('cpm_wrapper cpm_intro')" ng-model="data.intro"></textarea>
+					<div ng-bind-html-unsafe="data.intro" ng-hide-in-editor></div>
+
+					<hr class="ele_seperator">
+				</div>
+
+
+				<!-- Sections!-->
+				<div ng-repeat="section in data.sections track by $index" class="cpm_section relative"  ng-class="{'cpm_adjustSection1':!section.showIcon}">
+					<div>
+						<input type="checkbox" ng-model="section.showIcon" class="editorItem noIcon">
+						<img ng-class="{'invisible':!section.showIcon}" ng-src="{{placeholders.titleIcon}}" class="ele_sectionIcon">
+					</div>
+					<h6 ng-class="{'invisible':!section.showIcon}" class="cpm_sectionTitle" ng-model="section.title" ng-init="moniter()" medium-editor options='{"placeholder":"", "buttons": [], "disableToolbar":true, "disableReturn":true}'></h6>
+
+
+					<!-- Rows !-->
+					<div ng-repeat="row in section.rows track by $index" class="relative cpm_row cpm_row_{{row.type}}">
+						<div class="editorItem cpm_removeRow fa fa-minus-circle" title="Remove row" ng-click="removeRow(section, $index)"></div>
+						<img ng-src="{{placeholders.up}}" class="editorItem cpm_moveRowUp" ng-show="$index>0" ng-click="moveRow(section, $index, $index-1); ">
+						<img ng-src="{{placeholders.down}}" class="editorItem cpm_moveRowDown" ng-show="(section.rows.length-1) > $index" ng-click="moveRow(section, $index, $index+1)">
+						<div ng-include="'sys/section-templates/'+row.type+'.html'"></div>
+					</div>
+
+
+
+					<!-- Add row/s button !-->
+					<div class="editorItem editRow fa fa-cogs" title="Add new rows" ng-click="$root.toolsMenu = ($root.toolsMenu == section||section)" >&nbsp;</div>
+					<div class="editorItem cpm_removeSection fa  fa-minus-circle" title="Remove section" ng-click="removeSection($index)"></div>
+					<img ng-src="{{placeholders.up}}" class="editorItem cpm_moveSectionUp" ng-show="$index>0" ng-click="moveSection($index, $index-1)">
+					<img ng-src="{{placeholders.down}}" class="editorItem cpm_moveSectionDown" ng-show="(data.sections.length-1) > $index" ng-click="moveSection($index, $index+1)">
+
+
+					<div class="editorItem tooltip left fade out editor_tooltip" ng-class="{'in':$root.toolsMenu == section}">
+						<div class="tooltip-arrow"></div>
+						<div class="tooltip-inner">
+							<span title="Adds a sub button row" ng-click="addRow('subButtons', section)"><span class="fa fa-circle-o" style="font-size: 37px;color: #fff;margin-left: 2px;margin-bottom: -8px;"></span></span><br><br>
+							<span title="Adds a new text row" ng-click="addRow('text',section)"><img src="sys/img/icons/editor-btn-text.svg"></span><br><br>
+							<span title="Adds a new text row that has an image/video on the side" ng-click="addRow('text-with-image',section)"><img src="sys/img/icons/editor-btn-text-with-icon.svg"></span><br><br>
+							<span title="Adds a new feature image/video" ng-click="addRow('featureImage',section)"><img src="sys/img/icons/editor-placeholder-image.svg"></span><br><br>
+							<span title="Adds a new image/video row" ng-click="addRow('video',section)"><img src="sys/img/icons/editor-btn-video.svg"></span><br><br>
+							<span title="Adds a new list" ng-click="addRow('list',section)"><img src="sys/img/icons/editor-btn-list.svg"></span><br><br>
+							<span title="Adds a new numbered list" ng-click="addRow('ordered-list',section)"><img src="sys/img/icons/editor-btn-ordered-list.svg"></span><br>
+							<span title="Adds a new Anchor" ng-click="addRow('anchor', section)"><span class="fa fa-anchor" style="font-size: 26px; color: #fff; margin: 4px; padding-top: 9px; "></span></span><br>
+						</div>
+					</div>
+
+
+
+
+
+				</div>
+
+			</div>
+
+			<div class="editorItem addSection fa fa-plus-circle" ng-click="addSection()" src="https://studyreserveprd.usq.edu.au/usq/file/d0c67c69-1e1b-4ada-b565-6a43f2b67513/1/icons/Editor-add.svg"></div>
+
+		</div>
+
+
+</body>
+
+
+</html>

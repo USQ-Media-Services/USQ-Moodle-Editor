@@ -1,0 +1,9 @@
+<div ng-style="{'text-align':row.align}">
+
+	<div title="{{video.title}}" ng-repeat="video in row.videos" ng-click="$root.edit = video;" usq-video-popup="{{base64(video.embed||video.image)}}"  class="cpm_videoBlock relative" ng-class="{'cpm_videoBlockInvisible': !video.image}">
+		<div class="cpm_videoBlockImage" ng-style="{'background-image': 'url(\'' + ( (!video.embed && !!video.image) || placeholders.video ) + ' \'), url(\''+(video.image||placeholders.floatingImage)+'\')'}"></div>
+		<div class="cpm_videoBlockTitle" >{{video.title}}</div>
+		<div ng-show="!!video.transcript" class="cpm_featureVideoTranscript"><a target="_blank" ng-href="{{video.transcript}}">View transcript</a></div>
+
+	</div>
+</div>

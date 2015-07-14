@@ -1,0 +1,14 @@
+<div class=" cpm_imageFloat{{row.align||'Right'}} ">
+
+
+	<div title="{{row.title}}" ng-click="$root.edit = row;" usq-video-popup="{{base64(row.embed||row.image)}}"  class="cpm_videoBlock cpm_videoWithTextBlock relative cpm_featureImage{{row.imageSize.trim()||'Small'}}" ng-class="{'cpm_videoBlockInvisible': !row.image}">
+		<div class="cpm_videoBlockImage" ng-style="{'background-image': 'url(\'' + ( (!row.embed && !!row.image) || placeholders.video ) + ' \'), url(\''+(row.image||placeholders.floatingImage)+'\')'}"></div>
+		<div class="cpm_videoBlockTitle" >{{row.title}}</div>
+		<div ng-show="!!row.transcript" class="cpm_featureVideoTranscript"><a target="_blank" ng-href="{{row.transcript}}">View transcript</a></div>
+
+	</div>
+
+
+</div>
+<textarea class="editorItem" ui-tinymce="getOptions('cpm_wrapper ele_text')" ng-model="row.text"></textarea>
+<div ng-bind-html-unsafe="row.text" ng-hide-in-editor class="ele_text"></div>

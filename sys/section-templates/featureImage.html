@@ -1,0 +1,6 @@
+<div>
+	<div title="{{row.title}}"  class="cpm_featureImage cpm_featureImage{{row.imageSize.replace('cpm_featureImage','').trim()||'Medium'}} relative " ng-click="$root.edit = row;" ng-class="{'cpm_featureImagePlaceholder':!row.image}" usq-video-popup="{{base64(row.embed||row.image)}}" ng-style="{'background-image': 'url(' + (!row.embed || placeholders.video) + '), url(\''+(row.image||placeholders.floatingImage)+'\')'}">
+		<div class="cpm_featureImageSubtitle">{{row.title}}</div>
+		<div ng-show="!!row.transcript" class="cpm_featureVideoTranscript"><a target="_blank" ng-href="{{row.transcript}}">View transcript</a></div>
+	</div>
+</div>

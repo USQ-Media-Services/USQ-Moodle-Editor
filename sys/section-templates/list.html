@@ -1,0 +1,5 @@
+<div class="cpm_listTitle"  medium-editor options='{ "buttons": ["bold","italic"], "disableToolbar":true, "disableReturn":true}' ng-model="row.title"  ></div>
+<div style="margin-top:18px" >
+	<textarea class="editorItem" ui-tinymce="getOptions('cpm_wrapper ele_text','bullist link', ' ', 'ul,li,a')" ng-model="row.text"></textarea>
+	<div ng-bind-html-unsafe="row.text" ng-hide-in-editor class="ele_text"></div>
+</div>

@@ -1,0 +1,5 @@
+<div ng-style="{'text-align':row.align}">
+	<br>
+	<a ng-repeat="button in data.headings[data.index].sub" kill-click ng-href="{{button.link}}"><div class="{{getImageName(button.image)}} cpm_subButton relative"><div class="cpm_subButtonTitle">{{button.title}}</div></div></a>
+	<br>
+</div>
